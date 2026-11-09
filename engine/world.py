@@ -1,4 +1,6 @@
 from dataclasses import dataclass, field
+from .forces import applyGravity, applyAcceleration
+from .motion import applyVelocity
 
 @dataclass
 class Circle:
@@ -32,7 +34,7 @@ class WorldObject:
     mesh: WorldObjectType
     position: Position
     velocity: Velocity = field(default_factory=lambda: Velocity(0,0))
-    acceleration: Acceleration = field(default_factory=lambda: Velocity(0,0))
+    acceleration: Acceleration = field(default_factory=lambda: Acceleration(0,0))
 
 class World:
     def __init__(self, gravity):
@@ -40,10 +42,13 @@ class World:
         self.objects = []
     def addObject(self, worldObject: WorldObject):
         self.objects.append(worldObject)
-    def update(self):
-        updateWorld(self)
+    def update(self, time: float):
+        updateWorld(self, time)
     def readState(self):
         return self.objects
 
-def updateWorld(world: World):
+def updateWorld(world: World, time: float):
+    applyGravity(world, time)
+    applyAcceleration(world, time)
+    applyVelocity(world, time)
     return
