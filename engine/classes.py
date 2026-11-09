@@ -15,12 +15,12 @@ class Position:
     y: float
 
 @dataclass
-class Velocity:
+class Force:
     x: float
     y: float
 
 @dataclass
-class Acceleration:
+class Velocity:
     x: float
     y: float
 
@@ -31,13 +31,18 @@ class WorldObject:
     mass: float
     mesh: WorldObjectType
     position: Position
+    force: Force = field(default_factory=lambda: Force(0,0))
+    currentForce: Force = field(default_factory=lambda: Force(0,0))
     velocity: Velocity = field(default_factory=lambda: Velocity(0,0))
-    acceleration: Acceleration = field(default_factory=lambda: Acceleration(0,0))
+
+    def addConstantForce(self, x: float, y: float):
+        self.force.x += x
+        self.force.y += y
+
+    def addForce(self, x: float, y: float):
+        self.currentForce.x += x
+        self.currentForce.y += y
 
     def addVelocity(self, x: float, y: float):
         self.velocity.x += x
-        self.velocity.y -= y
-
-    def addAcceleration(self, x: float, y: float):
-        self.acceleration.x += x
-        self.acceleration.y += y
+        self.velocity.y += y

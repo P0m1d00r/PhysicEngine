@@ -9,12 +9,12 @@ def main():
     world.addObject(circle1)
     world.addObject(rectangle1)
 
-    rectangle1.addVelocity(5, 0)
-    rectangle1.addAcceleration(0, 5)
+    circle1.addConstantForce(0, 5)
+    circle1.addVelocity(1, 0)
     for i in range(100):
         world.update(0.01)
         state = world.readState()
-        print(state)
+        print(state[0].position, state[0].velocity)
 
 
 if __name__ == "__main__":

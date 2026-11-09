@@ -7,8 +7,15 @@ def applyGravity(world: World, time: float):
     for obj in world.objects:
         if obj.mass == 0:
             continue
-        obj.velocity.y -= world.gravity * time
+        obj.currentForce.y -= world.gravity * obj.mass
+def addForces(world: World):
+    for obj in world.objects:
+        obj.currentForce.y += obj.force.y
+        obj.currentForce.x += obj.force.x
 def applyAcceleration(world: World, time: float):
     for obj in world.objects:
-        obj.velocity.y += obj.acceleration.y * time
-        obj.velocity.x += obj.acceleration.x * time
+        if obj.mass != 0:
+            obj.velocity.y += (obj.currentForce.y / obj.mass) * time
+            obj.velocity.x += (obj.currentForce.x / obj.mass) * time
+        obj.currentForce.y = 0
+        obj.currentForce.x = 0

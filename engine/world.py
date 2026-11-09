@@ -1,4 +1,4 @@
-from .forces import applyGravity, applyAcceleration
+from .forces import applyGravity, addForces, applyAcceleration
 from .motion import applyVelocity
 from .classes import WorldObject
 
@@ -15,6 +15,7 @@ class World:
 
 def updateWorld(world: World, time: float):
     applyGravity(world, time)
+    addForces(world)
     applyAcceleration(world, time)
     applyVelocity(world, time)
     return
