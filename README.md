@@ -15,3 +15,9 @@ I would like to make a simple game using that engine but for now the main goal i
 I don't know physics well so I spend much time trying to understand all that forces, motions etc.
 
 For now I am happy happy what I have done so far... eg. basic gravity, object/world properties
+
+### 10.11.2026 Day 2:
+
+Today not much progress... I was learning all that collision stuff etc. until 2am yesterday so now I am dying of sleepness...
+
+Overally I am happy about todays progress...

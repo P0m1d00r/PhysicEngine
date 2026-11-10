@@ -1,6 +1,7 @@
 from .forces import applyGravity, addForces, applyAcceleration
 from .motion import applyVelocity
 from .classes import WorldObject
+from .collisions import findCollisions
 
 class World:
     def __init__(self, gravity):
@@ -18,4 +19,6 @@ def updateWorld(world: World, time: float):
     addForces(world)
     applyAcceleration(world, time)
     applyVelocity(world, time)
+    collisions = findCollisions(world)
+
     return

@@ -1,13 +1,16 @@
 from dataclasses import dataclass, field
+from typing import Literal
 
 @dataclass
 class Circle:
     radius: float
+    type: Literal["circle"] = field(default="circle", init=False)
 
 @dataclass
 class Rectangle:
     width: float
     height: float
+    type: Literal["rectangle"] = field(default="rectangle", init=False)
 
 @dataclass
 class Position:
