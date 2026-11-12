@@ -28,4 +28,6 @@ I added rotation to objects and update all functions that were using them
 ### 12.11.2026 Day 4:
 
 Finally finished (I hope so) collision detection... now I am planning to start making another
-(probably even worse) part of collisions
+(probably even worse) part of collisions...
+
+For now I've also added basic overlap resolution

@@ -181,13 +181,38 @@ def checkColision(object1: WorldObject, object2: WorldObject):
         return False
 
 
-def findCollisions(world: World):
+def findCollisions(world: list[WorldObject]):
     collisions = []
-    for objIndex in range(len(world.objects)):
-        obj1 = world.objects[objIndex]
-        for obj2Index in range(objIndex + 1, len(world.objects)):
-            obj2 = world.objects[obj2Index]
+    for objIndex in range(len(world)):
+        obj1 = world[objIndex]
+        for obj2Index in range(objIndex + 1, len(world)):
+            obj2 = world[obj2Index]
             collision = checkColision(obj1, obj2)
             if collision:
                 collisions.append(collision)
     return collisions
+
+def resolveCollisions(world: World):
+    collisions = findCollisions(world.objects)
+    collidingObjects = []
+    for collision in collisions:
+        massSum: float = collision.object1.mass + collision.object2.mass
+        collision.object1.position.x -= collision.mtvNormal.x * collision.mtvDepth * collision.object2.mass / massSum
+        collision.object1.position.y -= collision.mtvNormal.y * collision.mtvDepth * collision.object2.mass / massSum
+        collision.object2.position.x += collision.mtvNormal.x * collision.mtvDepth * collision.object1.mass / massSum
+        collision.object2.position.y += collision.mtvNormal.y * collision.mtvDepth * collision.object1.mass / massSum
+
+        if collision.object1 not in collidingObjects:
+            collidingObjects.append(collision.object1)
+        if collision.object2 not in collidingObjects:
+            collidingObjects.append(collision.object2)
+
+    for i in range(3):
+        collisions = findCollisions(collidingObjects)
+        for collision in collisions:
+            massSum: float = collision.object1.mass + collision.object2.mass
+            collision.object1.position.x -= collision.mtvNormal.x * collision.mtvDepth * collision.object2.mass / massSum
+            collision.object1.position.y -= collision.mtvNormal.y * collision.mtvDepth * collision.object2.mass / massSum
+            collision.object2.position.x += collision.mtvNormal.x * collision.mtvDepth * collision.object1.mass / massSum
+            collision.object2.position.y += collision.mtvNormal.y * collision.mtvDepth * collision.object1.mass / massSum
+
