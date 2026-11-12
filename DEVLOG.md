@@ -24,3 +24,8 @@ Ok... so today i finisched collision detection for other types i will probably t
 couse as for now it's impossible to add rotated rectangle...
 
 I added rotation to objects and update all functions that were using them
+
+### 12.11.2026 Day 4:
+
+Finally finished (I hope so) collision detection... now I am planning to start making another
+(probably even worse) part of collisions
