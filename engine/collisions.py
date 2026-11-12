@@ -1,6 +1,6 @@
 from .classes import Rectangle, WorldObject, Position
 from typing import TYPE_CHECKING
-from math import sqrt
+from math import sqrt, radians, sin, cos
 
 if TYPE_CHECKING:
     from .world import World
@@ -12,7 +12,14 @@ def getRectangleCorners(obj: WorldObject):
     for xSign in range(-1, 2, 2):
         for ySign in range(-1, 2, 2):
             corners.append(Position(obj.position.x + xSign * 1/2 * obj.mesh.width, obj.position.y + ySign * 1/2 * obj.mesh.height))
-    return corners
+
+    rotatedCorners = []
+    rotationRad = radians(obj.rotation)
+    for corner in corners:
+        x = obj.position.x + (corner.x - obj.position.x) * cos(rotationRad) - (corner.y - obj.position.y) * sin(rotationRad)
+        y = obj.position.y + (corner.x - obj.position.x) * sin(rotationRad) + (corner.y - obj.position.y) * cos(rotationRad)
+        rotatedCorners.append(Position(x, y))
+    return rotatedCorners
 
 def calclateNormals(corner1: Position, corner2: Position, corner3: Position, corner4: Position):
     corners = [corner1, corner2, corner3, corner4]

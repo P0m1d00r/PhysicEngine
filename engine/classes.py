@@ -34,6 +34,7 @@ class WorldObject:
     mass: float
     mesh: WorldObjectType
     position: Position
+    rotation: float
     force: Force = field(default_factory=lambda: Force(0,0))
     currentForce: Force = field(default_factory=lambda: Force(0,0))
     velocity: Velocity = field(default_factory=lambda: Velocity(0,0))
