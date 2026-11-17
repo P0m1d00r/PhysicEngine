@@ -196,11 +196,35 @@ def resolveCollisions(world: World):
     collisions = findCollisions(world.objects)
     collidingObjects = []
     for collision in collisions:
-        massSum: float = collision.object1.mass + collision.object2.mass
-        collision.object1.position.x -= collision.mtvNormal.x * collision.mtvDepth * collision.object2.mass / massSum
-        collision.object1.position.y -= collision.mtvNormal.y * collision.mtvDepth * collision.object2.mass / massSum
-        collision.object2.position.x += collision.mtvNormal.x * collision.mtvDepth * collision.object1.mass / massSum
-        collision.object2.position.y += collision.mtvNormal.y * collision.mtvDepth * collision.object1.mass / massSum
+
+        if collision.object1.mass == 0:
+            invObject1Mass = 0
+        else:
+            invObject1Mass = 1 / collision.object1.mass
+
+        if collision.object2.mass == 0:
+            invObject2Mass = 0
+        else:
+            invObject2Mass = 1 / collision.object2.mass
+
+        invMassSum: float = invObject1Mass + invObject2Mass
+        if invMassSum == 0:
+            continue
+        collision.object1.position.x -= collision.mtvNormal.x * collision.mtvDepth * invObject1Mass / invMassSum
+        collision.object1.position.y -= collision.mtvNormal.y * collision.mtvDepth * invObject1Mass / invMassSum
+        collision.object2.position.x += collision.mtvNormal.x * collision.mtvDepth * invObject2Mass / invMassSum
+        collision.object2.position.y += collision.mtvNormal.y * collision.mtvDepth * invObject2Mass / invMassSum
+        vRel: Position = Position(collision.object2.velocity.x - collision.object1.velocity.x, collision.object2.velocity.y - collision.object1.velocity.y)
+        vNor = vRel.x * collision.mtvNormal.x + vRel.y * collision.mtvNormal.y
+        if vNor <= 0:
+            vNorRestitution = vNor * -1 * min(collision.object1.restitution, collision.object2.restitution)
+            j = (vNorRestitution - vNor) / (invObject1Mass + invObject2Mass)
+            j1 = j * invObject1Mass
+            j2 = j * invObject2Mass
+            collision.object1.velocity.x -= collision.mtvNormal.x * j1
+            collision.object1.velocity.y -= collision.mtvNormal.y * j1
+            collision.object2.velocity.x += collision.mtvNormal.x * j2
+            collision.object2.velocity.y += collision.mtvNormal.y * j2
 
         if collision.object1 not in collidingObjects:
             collidingObjects.append(collision.object1)
@@ -210,9 +234,38 @@ def resolveCollisions(world: World):
     for i in range(3):
         collisions = findCollisions(collidingObjects)
         for collision in collisions:
-            massSum: float = collision.object1.mass + collision.object2.mass
-            collision.object1.position.x -= collision.mtvNormal.x * collision.mtvDepth * collision.object2.mass / massSum
-            collision.object1.position.y -= collision.mtvNormal.y * collision.mtvDepth * collision.object2.mass / massSum
-            collision.object2.position.x += collision.mtvNormal.x * collision.mtvDepth * collision.object1.mass / massSum
-            collision.object2.position.y += collision.mtvNormal.y * collision.mtvDepth * collision.object1.mass / massSum
+            if collision.object1.mass == 0:
+                invObject1Mass = 0
+            else:
+                invObject1Mass = 1 / collision.object1.mass
+
+            if collision.object2.mass == 0:
+                invObject2Mass = 0
+            else:
+                invObject2Mass = 1 / collision.object2.mass
+
+            invMassSum: float = invObject1Mass + invObject2Mass
+            if invMassSum == 0:
+                continue
+            collision.object1.position.x -= collision.mtvNormal.x * collision.mtvDepth * invObject1Mass / invMassSum
+            collision.object1.position.y -= collision.mtvNormal.y * collision.mtvDepth * invObject1Mass / invMassSum
+            collision.object2.position.x += collision.mtvNormal.x * collision.mtvDepth * invObject2Mass / invMassSum
+            collision.object2.position.y += collision.mtvNormal.y * collision.mtvDepth * invObject2Mass / invMassSum
+            vRel: Position = Position(collision.object2.velocity.x - collision.object1.velocity.x,
+                                      collision.object2.velocity.y - collision.object1.velocity.y)
+            vNor = vRel.x * collision.mtvNormal.x + vRel.y * collision.mtvNormal.y
+            if vNor <= 0:
+                vNorRestitution = vNor * -1 * min(collision.object1.restitution, collision.object2.restitution)
+                j = (vNorRestitution - vNor) / (invObject1Mass + invObject2Mass)
+                j1 = j * invObject1Mass
+                j2 = j * invObject2Mass
+                collision.object1.velocity.x -= collision.mtvNormal.x * j1
+                collision.object1.velocity.y -= collision.mtvNormal.y * j1
+                collision.object2.velocity.x += collision.mtvNormal.x * j2
+                collision.object2.velocity.y += collision.mtvNormal.y * j2
+
+            if collision.object1 not in collidingObjects:
+                collidingObjects.append(collision.object1)
+            if collision.object2 not in collidingObjects:
+                collidingObjects.append(collision.object2)
 

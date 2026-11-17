@@ -31,3 +31,10 @@ Finally finished (I hope so) collision detection... now I am planning to start m
 (probably even worse) part of collisions...
 
 For now I've also added basic overlap resolution
+
+### 17.11.2026 Day 5:
+
+Ok so last week I was sleeping around 4h/day so I am basically dead, but after long fight with that program
+and physics I finally managed to add collision forces.
+
+It is working... unless the objects aren't too fast, but I will try to fix that later (I won't)
