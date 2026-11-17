@@ -19,6 +19,6 @@ def updateWorld(world: World, time: float):
     addForces(world)
     applyAcceleration(world, time)
     applyVelocity(world, time)
-    collisions = findCollisions(world)
+    collisions = findCollisions(world.objects)
 
     return
