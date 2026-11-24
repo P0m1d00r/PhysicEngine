@@ -36,8 +36,11 @@ class WorldObject:
     position: Position
     rotation: float
     restitution: float
+    angularForce: float = 0.0
+    currentAngularForce: float = 0.0
     force: Force = field(default_factory=lambda: Force(0,0))
     currentForce: Force = field(default_factory=lambda: Force(0,0))
+    angularVelocity: float = 0.0
     velocity: Velocity = field(default_factory=lambda: Velocity(0,0))
 
     def addConstantForce(self, x: float, y: float):
@@ -51,3 +54,12 @@ class WorldObject:
     def addVelocity(self, x: float, y: float):
         self.velocity.x += x
         self.velocity.y += y
+
+    def addConstantAngularForce(self, force: float):
+        self.angularForce += force
+
+    def addAngularForce(self, force: float):
+        self.currentAngularForce += force
+
+    def addAngularVelocity(self, velocity: float):
+        self.angularVelocity += velocity

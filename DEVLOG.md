@@ -34,7 +34,14 @@ For now I've also added basic overlap resolution
 
 ### 17.11.2026 Day 5:
 
-Ok so last week I was sleeping around 4h/day so I am basically dead, but after long fight with that program
+Ok so last week I was sleeping around 4h/day, so I am basically dead, but after long fight with that program
 and physics I finally managed to add collision forces.
 
 It is working... unless the objects aren't too fast, but I will try to fix that later (I won't)
+
+### 24.11.2026 Day 6:
+
+Ok I think that I finally managed to end core of the engine... 
+
+I know that it's not perfect and don't work very well, but I think it's enough as for now... 
+now I am planning to make some kind of easy game using that... I hope the engine will survive that and won't crash every second, but we will see...

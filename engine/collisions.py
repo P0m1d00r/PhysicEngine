@@ -12,6 +12,7 @@ class Collision:
     object2: WorldObject
     mtvNormal: Position
     mtvDepth: float
+    contactPoint: Position | None = None
 
 def getRectangleCorners(obj: WorldObject):
     corners = []
@@ -54,9 +55,10 @@ def checkColision(object1: WorldObject, object2: WorldObject):
         object1Corners = getRectangleCorners(object1)
         object2Corners = getRectangleCorners(object2)
         normals = []
-
-        normals.extend(calcuateNormals(object1Corners[0], object1Corners[1], object1Corners[2], object1Corners[3]))
-        normals.extend(calcuateNormals(object2Corners[0], object2Corners[1], object2Corners[2], object2Corners[3]))
+        object1Normals = calcuateNormals(object1Corners[0], object1Corners[1], object1Corners[2], object1Corners[3])
+        object2Normals = calcuateNormals(object2Corners[0], object2Corners[1], object2Corners[2], object2Corners[3])
+        normals.extend(object1Normals)
+        normals.extend(object2Normals)
 
         collision = Collision(object1, object2, Position(0,0), float('inf'))
 
@@ -87,6 +89,76 @@ def checkColision(object1: WorldObject, object2: WorldObject):
                         collision.mtvNormal = Position(-1 * normal.x / normalLen, -1 * normal.y / normalLen)
                     else:
                         collision.mtvNormal = Position(normal.x / normalLen, normal.y / normalLen)
+
+        for i in range(len(object1Normals)):
+            length = sqrt(object1Normals[i].x**2 + object1Normals[i].y**2)
+            object1Normals[i].x = object1Normals[i].x / length
+            object1Normals[i].y = object1Normals[i].y / length
+
+        object1CornersInObject1Local = []
+        for corner in object1Corners:
+            localCornerX = corner.x * object1Normals[0].x + corner.y * object1Normals[0].y
+            localCornerY = corner.x * object1Normals[1].x + corner.y * object1Normals[1].y
+            object1CornersInObject1Local.append(Position(localCornerX, localCornerY))
+
+        object2CornersInObject1Local = []
+        for corner in object2Corners:
+            localCornerX = corner.x * object1Normals[0].x + corner.y * object1Normals[0].y
+            localCornerY = corner.x * object1Normals[1].x + corner.y * object1Normals[1].y
+            object2CornersInObject1Local.append(Position(localCornerX, localCornerY))
+
+        object1LocalMinX = min(object1CornersInObject1Local[0].x,object1CornersInObject1Local[1].x,object1CornersInObject1Local[2].x,object1CornersInObject1Local[3].x)
+        object1LocalMaxX = max(object1CornersInObject1Local[0].x,object1CornersInObject1Local[1].x,object1CornersInObject1Local[2].x,object1CornersInObject1Local[3].x)
+        object1LocalMinY = min(object1CornersInObject1Local[0].y,object1CornersInObject1Local[1].y,object1CornersInObject1Local[2].y,object1CornersInObject1Local[3].y)
+        object1LocalMaxY = max(object1CornersInObject1Local[0].y,object1CornersInObject1Local[1].y,object1CornersInObject1Local[2].y,object1CornersInObject1Local[3].y)
+
+        object2CornersInsideObject1 = []
+        for i in range(len(object2CornersInObject1Local)):
+            if object1LocalMinX <= object2CornersInObject1Local[i].x <= object1LocalMaxX and object1LocalMinY <= object2CornersInObject1Local[i].y <= object1LocalMaxY:
+                object2CornersInsideObject1.append(object2Corners[i])
+
+        # =======================================================================================
+
+        for i in range(len(object2Normals)):
+            length = sqrt(object2Normals[i].x**2 + object2Normals[i].y**2)
+            object2Normals[i].x = object2Normals[i].x / length
+            object2Normals[i].y = object2Normals[i].y / length
+
+        object2CornersInObject2Local = []
+        for corner in object2Corners:
+            localCornerX = corner.x * object2Normals[0].x + corner.y * object2Normals[0].y
+            localCornerY = corner.x * object2Normals[1].x + corner.y * object2Normals[1].y
+            object2CornersInObject2Local.append(Position(localCornerX, localCornerY))
+
+        object1CornersInObject2Local = []
+        for corner in object1Corners:
+            localCornerX = corner.x * object2Normals[0].x + corner.y * object2Normals[0].y
+            localCornerY = corner.x * object2Normals[1].x + corner.y * object2Normals[1].y
+            object1CornersInObject2Local.append(Position(localCornerX, localCornerY))
+
+        object2LocalMinX = min(object2CornersInObject2Local[0].x,object2CornersInObject2Local[1].x,object2CornersInObject2Local[2].x,object2CornersInObject2Local[3].x)
+        object2LocalMaxX = max(object2CornersInObject2Local[0].x,object2CornersInObject2Local[1].x,object2CornersInObject2Local[2].x,object2CornersInObject2Local[3].x)
+        object2LocalMinY = min(object2CornersInObject2Local[0].y,object2CornersInObject2Local[1].y,object2CornersInObject2Local[2].y,object2CornersInObject2Local[3].y)
+        object2LocalMaxY = max(object2CornersInObject2Local[0].y,object2CornersInObject2Local[1].y,object2CornersInObject2Local[2].y,object2CornersInObject2Local[3].y)
+
+        object1CornersInsideObject2 = []
+        for i in range(len(object1CornersInObject2Local)):
+            if object2LocalMinX <= object1CornersInObject2Local[i].x <= object2LocalMaxX and object2LocalMinY <= object1CornersInObject2Local[i].y <= object2LocalMaxY:
+                object1CornersInsideObject2.append(object1Corners[i])
+
+        allCornersInside = []
+        allCornersInside.extend(object1CornersInsideObject2)
+        allCornersInside.extend(object2CornersInsideObject1)
+
+        if len(allCornersInside) > 0:
+            allCornersInsideXSum = 0
+            allCornersInsideYSum = 0
+            for corner in allCornersInside:
+                allCornersInsideXSum += corner.x
+                allCornersInsideYSum += corner.y
+            collision.contactPoint = Position(allCornersInsideXSum / len(allCornersInside), allCornersInsideYSum / len(allCornersInside))
+        else:
+            collision.contactPoint = Position((object1.position.x + object2.position.x) / 2, (object1.position.y + object2.position.y) / 2)
 
         return collision
 
@@ -161,6 +233,9 @@ def checkColision(object1: WorldObject, object2: WorldObject):
             else:
                 collision.mtvNormal = Position(normal.x, normal.y)
 
+            closestPoint: Position = Position(closestRectanglePoint.x * rectangleNormals[0].x + closestRectanglePoint.y * rectangleNormals[1].x, closestRectanglePoint.x * rectangleNormals[0].y + closestRectanglePoint.y * rectangleNormals[1].y)
+            collision.contactPoint = closestPoint
+
             return collision
 
         return False
@@ -175,6 +250,10 @@ def checkColision(object1: WorldObject, object2: WorldObject):
             else:
                 normal = Position(object2.position.x - object1.position.x, object2.position.y - object1.position.y)
                 collision.mtvNormal = Position(normal.x / centersDistance, normal.y / centersDistance)
+            overlapStart = max(-object1.mesh.radius, centersDistance - object2.mesh.radius)
+            overlapEnd = min(object1.mesh.radius, centersDistance + object2.mesh.radius)
+            overlapMiddle = (overlapStart + overlapEnd) / 2
+            collision.contactPoint = Position(object1.position.x + collision.mtvNormal.x * overlapMiddle, object1.position.y + collision.mtvNormal.y * overlapMiddle)
             return collision
         return False
     else:
@@ -196,16 +275,33 @@ def resolveCollisions(world: World):
     collisions = findCollisions(world.objects)
     collidingObjects = []
     for collision in collisions:
-
         if collision.object1.mass == 0:
             invObject1Mass = 0
+            invObject1Interia = 0
         else:
             invObject1Mass = 1 / collision.object1.mass
+            if collision.object1.mesh.type == 'circle':
+                invObject1Interia = 1 / (0.5 * collision.object1.mass * collision.object1.mesh.radius ** 2)
+            elif collision.object1.mesh.type == 'rectangle':
+                invObject1Interia = 1 / (collision.object1.mass * (collision.object1.mesh.width ** 2 + collision.object1.mesh.height ** 2) / 12)
 
         if collision.object2.mass == 0:
             invObject2Mass = 0
+            invObject2Interia = 0
         else:
             invObject2Mass = 1 / collision.object2.mass
+            if collision.object2.mesh.type == 'circle':
+                invObject2Interia = 1 / (0.5 * collision.object2.mass * collision.object2.mesh.radius ** 2)
+            elif collision.object2.mesh.type == 'rectangle':
+                invObject2Interia = 1 / (collision.object2.mass * (
+                            collision.object2.mesh.width ** 2 + collision.object2.mesh.height ** 2) / 12)
+
+        object1Angle = Position(collision.contactPoint.x - collision.object1.position.x, collision.contactPoint.y - collision.object1.position.y)
+        object2Angle = Position(collision.contactPoint.x - collision.object2.position.x, collision.contactPoint.y - collision.object2.position.y)
+
+
+        angle1CrossNormal = object1Angle.x * collision.mtvNormal.y - object1Angle.y * collision.mtvNormal.x
+        angle2CrossNormal = object2Angle.x * collision.mtvNormal.y - object2Angle.y * collision.mtvNormal.x
 
         invMassSum: float = invObject1Mass + invObject2Mass
         if invMassSum == 0:
@@ -214,17 +310,22 @@ def resolveCollisions(world: World):
         collision.object1.position.y -= collision.mtvNormal.y * collision.mtvDepth * invObject1Mass / invMassSum
         collision.object2.position.x += collision.mtvNormal.x * collision.mtvDepth * invObject2Mass / invMassSum
         collision.object2.position.y += collision.mtvNormal.y * collision.mtvDepth * invObject2Mass / invMassSum
-        vRel: Position = Position(collision.object2.velocity.x - collision.object1.velocity.x, collision.object2.velocity.y - collision.object1.velocity.y)
+        vRel: Position = Position(
+            (collision.object2.velocity.x - collision.object2.angularVelocity * object2Angle.y) - (collision.object1.velocity.x - collision.object1.angularVelocity * object1Angle.y),
+            (collision.object2.velocity.y + collision.object2.angularVelocity * object2Angle.x) - (collision.object1.velocity.y + collision.object1.angularVelocity * object1Angle.x)
+        )
         vNor = vRel.x * collision.mtvNormal.x + vRel.y * collision.mtvNormal.y
         if vNor <= 0:
-            vNorRestitution = vNor * -1 * min(collision.object1.restitution, collision.object2.restitution)
-            j = (vNorRestitution - vNor) / (invObject1Mass + invObject2Mass)
+            vNorRestitution = 0 if abs(vNor) < 0.5 else vNor * -1 * min(collision.object1.restitution, collision.object2.restitution)
+            j = (vNorRestitution - vNor) / (invObject1Mass + invObject2Mass + angle1CrossNormal**2 * invObject1Interia + angle2CrossNormal**2 * invObject2Interia)
             j1 = j * invObject1Mass
             j2 = j * invObject2Mass
             collision.object1.velocity.x -= collision.mtvNormal.x * j1
             collision.object1.velocity.y -= collision.mtvNormal.y * j1
             collision.object2.velocity.x += collision.mtvNormal.x * j2
             collision.object2.velocity.y += collision.mtvNormal.y * j2
+            collision.object1.angularVelocity -= angle1CrossNormal * j * invObject1Interia
+            collision.object2.angularVelocity += angle2CrossNormal * j * invObject2Interia
 
         if collision.object1 not in collidingObjects:
             collidingObjects.append(collision.object1)
@@ -236,13 +337,33 @@ def resolveCollisions(world: World):
         for collision in collisions:
             if collision.object1.mass == 0:
                 invObject1Mass = 0
+                invObject1Interia = 0
             else:
                 invObject1Mass = 1 / collision.object1.mass
+                if collision.object1.mesh.type == 'circle':
+                    invObject1Interia = 1 / (0.5 * collision.object1.mass * collision.object1.mesh.radius ** 2)
+                elif collision.object1.mesh.type == 'rectangle':
+                    invObject1Interia = 1 / (collision.object1.mass * (
+                                collision.object1.mesh.width ** 2 + collision.object1.mesh.height ** 2) / 12)
 
             if collision.object2.mass == 0:
                 invObject2Mass = 0
+                invObject2Interia = 0
             else:
                 invObject2Mass = 1 / collision.object2.mass
+                if collision.object2.mesh.type == 'circle':
+                    invObject2Interia = 1 / (0.5 * collision.object2.mass * collision.object2.mesh.radius ** 2)
+                elif collision.object2.mesh.type == 'rectangle':
+                    invObject2Interia = 1 / (collision.object2.mass * (
+                            collision.object2.mesh.width ** 2 + collision.object2.mesh.height ** 2) / 12)
+
+            object1Angle = Position(collision.contactPoint.x - collision.object1.position.x,
+                                    collision.contactPoint.y - collision.object1.position.y)
+            object2Angle = Position(collision.contactPoint.x - collision.object2.position.x,
+                                    collision.contactPoint.y - collision.object2.position.y)
+
+            angle1CrossNormal = object1Angle.x * collision.mtvNormal.y - object1Angle.y * collision.mtvNormal.x
+            angle2CrossNormal = object2Angle.x * collision.mtvNormal.y - object2Angle.y * collision.mtvNormal.x
 
             invMassSum: float = invObject1Mass + invObject2Mass
             if invMassSum == 0:
@@ -251,21 +372,26 @@ def resolveCollisions(world: World):
             collision.object1.position.y -= collision.mtvNormal.y * collision.mtvDepth * invObject1Mass / invMassSum
             collision.object2.position.x += collision.mtvNormal.x * collision.mtvDepth * invObject2Mass / invMassSum
             collision.object2.position.y += collision.mtvNormal.y * collision.mtvDepth * invObject2Mass / invMassSum
-            vRel: Position = Position(collision.object2.velocity.x - collision.object1.velocity.x,
-                                      collision.object2.velocity.y - collision.object1.velocity.y)
+            vRel: Position = Position(
+                (collision.object2.velocity.x - collision.object2.angularVelocity * object2Angle.y) - (
+                            collision.object1.velocity.x - collision.object1.angularVelocity * object1Angle.y),
+                (collision.object2.velocity.y + collision.object2.angularVelocity * object2Angle.x) - (
+                            collision.object1.velocity.y + collision.object1.angularVelocity * object1Angle.x)
+            )
             vNor = vRel.x * collision.mtvNormal.x + vRel.y * collision.mtvNormal.y
             if vNor <= 0:
-                vNorRestitution = vNor * -1 * min(collision.object1.restitution, collision.object2.restitution)
-                j = (vNorRestitution - vNor) / (invObject1Mass + invObject2Mass)
+                vNorRestitution = 0 if abs(vNor) < 0.5 else vNor * -1 * min(collision.object1.restitution, collision.object2.restitution)
+                j = (vNorRestitution - vNor) / (invObject1Mass + invObject2Mass + (angle1CrossNormal ** 2) * invObject1Interia + (angle2CrossNormal ** 2) * invObject2Interia)
                 j1 = j * invObject1Mass
                 j2 = j * invObject2Mass
                 collision.object1.velocity.x -= collision.mtvNormal.x * j1
                 collision.object1.velocity.y -= collision.mtvNormal.y * j1
                 collision.object2.velocity.x += collision.mtvNormal.x * j2
                 collision.object2.velocity.y += collision.mtvNormal.y * j2
+                collision.object1.angularVelocity -= angle1CrossNormal * j * invObject1Interia
+                collision.object2.angularVelocity += angle2CrossNormal * j * invObject2Interia
 
             if collision.object1 not in collidingObjects:
                 collidingObjects.append(collision.object1)
             if collision.object2 not in collidingObjects:
                 collidingObjects.append(collision.object2)
-
