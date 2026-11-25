@@ -36,6 +36,7 @@ class WorldObject:
     position: Position
     rotation: float
     restitution: float
+    color: str
     angularForce: float = 0.0
     currentAngularForce: float = 0.0
     force: Force = field(default_factory=lambda: Force(0,0))
