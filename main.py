@@ -1,14 +1,14 @@
 from engine.world import World
 from engine.classes import WorldObject, Circle, Rectangle, Position
 from engine.collisions import getRectangleCorners
+from game.config import SCALE, SCREEN_HEIGHT, SCREEN_WIDTH
+from game.menu import openMenu
 import pygame
-import time
 import threading
+import sys
 
-SCALE = 40
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
 jumpingCooldown = False
+activateMenu = False
 
 def drawObject(object: WorldObject, screen: pygame.Surface):
     if object.mesh.type == 'rectangle':
@@ -23,46 +23,70 @@ def drawObject(object: WorldObject, screen: pygame.Surface):
         radius = object.mesh.radius * SCALE
         pygame.draw.circle(screen, object.color, position, radius)
 
+
+
 def resetJumpCooldown():
     global jumpingCooldown
     jumpingCooldown = False
 
-def main():
-    pygame.init()
-    world = World(gravity=9.81)
+
+
+def generateFrame(screen: pygame.Surface, world: World):
+    screen.fill((0, 0, 0))
+    for object in world.objects:
+        drawObject(object, screen)
+    pygame.display.flip()
+
+
+
+def checkEvents(player: WorldObject):
     global jumpingCooldown
+    global activateMenu
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE and jumpingCooldown == False:
+                jumpingCooldown = True
+                threading.Timer(1, resetJumpCooldown).start()
+                player.addForce(0, 400)
+            if event.key == pygame.K_ESCAPE:
+                activateMenu = True
+
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_d]:
+        player.addForce(2, 0)
+    if keys[pygame.K_a]:
+        player.addForce(-2, 0)
+
+
+
+def main():
+    global activateMenu
+
+    pygame.init()
+
+    world = World(gravity=9.81)
     player = WorldObject(mass=1, position=Position(2, 1.5), mesh=Circle(radius=0.5), rotation=0, restitution=0.5, color='#eeaaee')
     world.objects.extend([
         WorldObject(mass=0, position=Position(10, 0.5), mesh=Rectangle(width=20, height=1), rotation=0, restitution=0.5, color='#ffffff'),
-        player
-        ])
+        player])
 
     screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
     clock = pygame.time.Clock()
 
     while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE and jumpingCooldown == False:
-                    jumpingCooldown = True
-                    threading.Timer(1, resetJumpCooldown).start()
-                    player.addForce(0, 400 )
+        checkEvents(player)
 
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_d]:
-            player.addForce(2,0)
-        if keys[pygame.K_a]:
-            player.addForce(-2,0)
-
-
+        if activateMenu:
+            activateMenu = False
+            openMenu(screen, player, clock)
+            continue
+        else:
+            generateFrame(screen, world)
         time = clock.tick(60) / 1000
-
-        screen.fill((0, 0, 0))
-        for object in world.objects:
-            drawObject(object, screen)
-        pygame.display.flip()
         world.update(time)
 if __name__ == "__main__":
     main()
