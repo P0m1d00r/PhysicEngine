@@ -55,3 +55,8 @@ Today I was struggling to fix some bugs in engine. I also added basic visualizat
 I think that I have really good idea for the game that I am planning to make using that engine... but we will see...
 
 Ok... so... I've also added basic player movement, and currently I am struggling to make game menu (I will probably finish it tomorrow)
+
+### 26.11.2026 Day 8:
+
+Ok so... today I built mvp of the game... It looks preety well, and I am very happy about that...
+I will try to polish it tomorrow but as I told before I am very happy about today's huge progress
