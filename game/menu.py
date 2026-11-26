@@ -6,6 +6,8 @@ import sys
 
 pygame.font.init()
 FONT_BUTTON = pygame.font.SysFont('Arial', 36)
+FONT_STAT = pygame.font.SysFont('Arial', 18)
+menuActions = []
 
 class Button:
     def __init__(self, text: str, x: int, y: int, width: int, height: int, action: Callable[[], None]):
@@ -34,8 +36,26 @@ class Button:
             labelRect = label.get_rect(center=(self.x + self.width / 2, self.y + self.height / 2))
             screen.blit(label, labelRect)
 
+class Stat:
+    def __init__(self, text: str, value: str, x: int, y: int):
+        self.text = text
+        self.value = value
+        self.x = x * SCALE
+        self.y = y * SCALE
+        self.height = 1.5 * SCALE
+        self.width = 3 * SCALE
+        self.isHovered = False
 
+    def draw(self, screen: pygame.Surface):
+        pygame.draw.rect(screen, '#555565', (self.x, self.y, self.width, self.height))
+        label = FONT_BUTTON.render(self.value, True, '#ffffff')
+        labelRect = label.get_rect(center=(self.x + self.width / 2, self.y + self.height / 2))
+        screen.blit(label, labelRect)
 
+        pygame.draw.rect(screen, '#e39347', (self.x, self.y + self.height, self.width, self.height / 2))
+        label = FONT_STAT.render(self.text, True, '#ffffff')
+        labelRect = label.get_rect(center=(self.x + self.width / 2, (self.y + self.height) + self.height / 4))
+        screen.blit(label, labelRect)
 
 def screenMiddleX(width: int):
     return (SCREEN_WIDTH / 2 / SCALE) - (width / 2)
@@ -49,6 +69,10 @@ def closeMenu():
 def closeGame():
     pygame.quit()
     sys.exit()
+
+def restartGame():
+    menuActions.append('RESTART')
+    closeMenu()
 
 def checkEvents(buttons: list[Button]):
     for event in pygame.event.get():
@@ -70,11 +94,18 @@ def openMenu(screen: pygame.Surface, player: WorldObject, clock: pygame.time.Clo
     global leftMenu
     leftMenu = False
 
+    # [0] -> Buttons, [1] -> Stats
     MENU_LAYOUT = [
         [
             Button('Continue', screenMiddleX(8), 8, 8, 1, closeMenu),
+            Button('Restart', screenMiddleX(8), 10, 8, 1, restartGame),
             Button('Quit', screenMiddleX(8), 12, 8, 1, closeGame)
         ],
+        [
+            Stat('Mass', str(player.mass), screenMiddleX(3) - 5, 2),
+            Stat('Restitution', str(player.restitution), screenMiddleX(3), 2),
+            Stat('Mesh', player.mesh.type, screenMiddleX(3) + 5, 2),
+        ]
     ]
 
     while True:
@@ -92,9 +123,11 @@ def openMenu(screen: pygame.Surface, player: WorldObject, clock: pygame.time.Clo
         # screen etc.
         screen.fill('#353540')
         if leftMenu:
-            return
+            return menuActions
         else:
             for element in MENU_LAYOUT[0]:
+                element.draw(screen)
+            for element in MENU_LAYOUT[1]:
                 element.draw(screen)
         pygame.display.flip()
 

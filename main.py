@@ -7,10 +7,11 @@ from game.levels import levels
 import pygame
 import threading
 import sys
-
+import copy
 
 jumpingCooldown = False
 activateMenu = False
+menuActions = []
 
 level = 0
 world = World(gravity=9.81)
@@ -74,11 +75,11 @@ def buildLevel(level: int):
     global finish
 
     player = WorldObject(mass=1, position=Position(0.5, 1.5), mesh=Circle(radius=0.5), rotation=0, restitution=0.5, color='#bc87a5')
-    finish = levels[level][1]
+    finish = copy.deepcopy(levels[level][1])
 
     world.objects = []
 
-    world.objects.extend(levels[level][0])
+    world.objects = copy.deepcopy(levels[level][0])
     world.objects.append(player)
     world.objects.append(finish)
 
@@ -88,6 +89,7 @@ def main():
     global world
     global player
     global level
+    global menuActions
 
     buildLevel(0)
 
@@ -100,10 +102,15 @@ def main():
         # actions
         checkEvents(player)
 
+        for action in menuActions:
+            if action == 'RESTART':
+                buildLevel(level)
+        menuActions = []
+
         # opening menu/ frame generation
         if activateMenu:
             activateMenu = False
-            openMenu(screen, player, clock)
+            menuActions = openMenu(screen, player, clock)
             continue
         else:
             generateFrame(screen, world)
