@@ -15,19 +15,19 @@ class Button:
         self.width = width * SCALE
         self.height = height * SCALE
         self.isHovered = False
-        self.color = (150,150,150)
+        self.color = '#918d8d'
         self.action = action
 
     def draw(self, screen: pygame.Surface):
         if self.isHovered:
             pygame.draw.rect(screen, self.color, (self.x + 5, self.y - 5, self.width, self.height))
 
-            pygame.draw.rect(screen, (235, 161, 52), (self.x, self.y, self.width, self.height))
+            pygame.draw.rect(screen, '#e39347', (self.x, self.y, self.width, self.height))
             label = FONT_BUTTON.render(self.text, True, (255, 255, 255))
             labelRect = label.get_rect(center=(self.x + self.width / 2, self.y + self.height / 2))
             screen.blit(label, labelRect)
         else:
-            pygame.draw.rect(screen, (235, 161, 52), (self.x + 5, self.y - 5, self.width, self.height))
+            pygame.draw.rect(screen, '#e39347', (self.x + 5, self.y - 5, self.width, self.height))
 
             pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
             label = FONT_BUTTON.render(self.text, True, (255, 255, 255))
@@ -90,7 +90,7 @@ def openMenu(screen: pygame.Surface, player: WorldObject, clock: pygame.time.Clo
                 buttons[buttonIndex].isHovered = False
 
         # screen etc.
-        screen.fill((22, 22, 22))
+        screen.fill('#353540')
         if leftMenu:
             return
         else:
