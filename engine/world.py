@@ -6,7 +6,7 @@ from .collisions import resolveCollisions
 class World:
     def __init__(self, gravity):
         self.gravity = gravity
-        self.objects = []
+        self.objects: list[WorldObject] = []
     def addObject(self, worldObject: WorldObject):
         self.objects.append(worldObject)
     def update(self, time: float):

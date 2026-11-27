@@ -1,7 +1,7 @@
 from engine.world import World
 from engine.classes import WorldObject, Circle, Rectangle, Position
 from engine.collisions import getRectangleCorners, checkColision
-from game.config import SCALE, SCREEN_HEIGHT, SCREEN_WIDTH
+from game.config import SCALE, SCREEN_HEIGHT, SCREEN_WIDTH, MAP_WIDTH, MAP_HEIGHT
 from game.menu import openMenu
 from game.levels import levels
 import pygame
@@ -19,15 +19,18 @@ player = WorldObject(mass=1, position=Position(0.5, 1.5), mesh=Circle(radius=0.5
 finish = WorldObject(mass=0, position=Position(3, 10), mesh=Rectangle(width=1, height=1), rotation=0, restitution=0.5, color='#00ff00')
 
 def drawObject(object: WorldObject, screen: pygame.Surface):
+    cameraX = min(max(player.position.x * SCALE - SCREEN_WIDTH / 2, 0), MAP_WIDTH - SCREEN_WIDTH)
+    cameraY = min(max(player.position.y * SCALE - SCREEN_HEIGHT / 2, 0), MAP_HEIGHT - SCREEN_HEIGHT)
+
     if object.mesh.type == 'rectangle':
         corners = getRectangleCorners(object)
         corners = [corners[0], corners[2], corners[3], corners[1]]
         for i in range(len(corners)):
-            corners[i].x = corners[i].x * SCALE
-            corners[i].y = SCREEN_HEIGHT - (corners[i].y * SCALE)
+            corners[i].x = corners[i].x * SCALE - cameraX
+            corners[i].y = SCREEN_HEIGHT - (corners[i].y * SCALE - cameraY)
         pygame.draw.polygon(screen, object.color, [(c.x, c.y) for c in corners])
     elif object.mesh.type == 'circle':
-        position = (object.position.x * SCALE, SCREEN_HEIGHT - (object.position.y * SCALE))
+        position = (object.position.x * SCALE - cameraX, SCREEN_HEIGHT - (object.position.y * SCALE - cameraY))
         radius = object.mesh.radius * SCALE
         pygame.draw.circle(screen, object.color, position, radius)
 

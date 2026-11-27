@@ -5,9 +5,10 @@ from collections.abc import Callable
 import sys
 from engine.classes import Rectangle, Circle, WorldObject, Position
 
+MENU_SCALE = SCALE * 2
 pygame.font.init()
-FONT_BUTTON = pygame.font.SysFont('Arial', 36)
-FONT_STAT = pygame.font.SysFont('Arial', 18)
+FONT_BUTTON = pygame.font.SysFont('Arial', int(36 * MENU_SCALE / SCALE))
+FONT_STAT = pygame.font.SysFont('Arial', int(18 * MENU_SCALE / SCALE))
 menuActions = []
 
 global playerObj
@@ -15,10 +16,10 @@ global playerObj
 class Button:
     def __init__(self, text: str, x: int, y: int, width: int, height: int, action: Callable[[], None]):
         self.text = text
-        self.x = x * SCALE
-        self.y = y * SCALE
-        self.width = width * SCALE
-        self.height = height * SCALE
+        self.x = x * MENU_SCALE
+        self.y = y * MENU_SCALE
+        self.width = width * MENU_SCALE
+        self.height = height * MENU_SCALE
         self.isHovered = False
         self.color = '#918d8d'
         self.action = action
@@ -43,12 +44,12 @@ class Stat:
     def __init__(self, text: str, getValue: Callable[[], None], x: int, y: int, upArrowAction: Callable[[], None], downArrowAction: Callable[[], None]):
         self.text = text
         self.getValue = getValue
-        self.x = x * SCALE
-        self.y = y * SCALE
-        self.height = 1.5 * SCALE
-        self.width = 3 * SCALE
-        self.arrowHeight = 0.5 * SCALE
-        self.arrowWidth = 0.5 * SCALE
+        self.x = x * MENU_SCALE
+        self.y = y * MENU_SCALE
+        self.height = 1.5 * MENU_SCALE
+        self.width = 3 * MENU_SCALE
+        self.arrowHeight = 0.5 * MENU_SCALE
+        self.arrowWidth = 0.5 * MENU_SCALE
         self.upArrowX = self.x + self.width * 1.1
         self.upArrowY = self.y
         self.downArrowX = self.x + self.width * 1.1
@@ -85,7 +86,7 @@ class Stat:
         ])
 
 def screenMiddleX(width: int):
-    return (SCREEN_WIDTH / 2 / SCALE) - (width / 2)
+    return (SCREEN_WIDTH / 2 / MENU_SCALE) - (width / 2)
 
 leftMenu = False
 
