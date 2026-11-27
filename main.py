@@ -15,7 +15,7 @@ menuActions = []
 
 level = 0
 world = World(gravity=9.81)
-player = WorldObject(mass=1, position=Position(0.5, 1.5), mesh=Circle(radius=0.5), rotation=0, restitution=0.5, color='#bc87a5')
+player = WorldObject(mass=1, position=Position(1, 4.5), mesh=Circle(radius=0.5), rotation=0, restitution=0.5, color='#bc87a5')
 finish = WorldObject(mass=0, position=Position(3, 10), mesh=Rectangle(width=1, height=1), rotation=0, restitution=0.5, color='#00ff00')
 
 def drawObject(object: WorldObject, screen: pygame.Surface):
@@ -77,7 +77,7 @@ def buildLevel(level: int):
     global player
     global finish
 
-    player = WorldObject(mass=1, position=Position(0.5, 1.5), mesh=Circle(radius=0.5), rotation=0, restitution=0.5, color='#bc87a5')
+    player = WorldObject(mass=1, position=Position(1, 4.5), mesh=Circle(radius=0.5), rotation=0, restitution=0.5, color='#bc87a5')
     finish = copy.deepcopy(levels[level][1])
 
     world.objects = []

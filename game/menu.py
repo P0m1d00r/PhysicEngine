@@ -118,7 +118,7 @@ def addPlayerRestitution():
 
 def subPlayerRestitution():
     global playerObj
-    if playerObj.restitution > 0.1:
+    if playerObj.restitution >= 0.1:
         playerObj.restitution -= 0.1
         playerObj.restitution = round(playerObj.restitution, 1)
 

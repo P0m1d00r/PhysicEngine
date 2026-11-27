@@ -60,3 +60,9 @@ Ok... so... I've also added basic player movement, and currently I am struggling
 
 Ok so... today I built mvp of the game... It looks preety well, and I am very happy about that...
 I will try to polish it tomorrow but as I told before I am very happy about today's huge progress
+
+### 27.11.2026 Day 9:
+
+Today I was mostly focusing on building map... I added camera movement so I can make maps bigger than that window... 
+I lost much time testing that maps... maybe they are no perfect, but they are good enough... I don't really like current colors, 
+so I will probably change them in nearest future... but as for now I need to go to sleep
