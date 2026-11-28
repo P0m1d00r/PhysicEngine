@@ -2,7 +2,7 @@ from engine.world import World
 from engine.classes import WorldObject, Circle, Rectangle, Position
 from engine.collisions import getRectangleCorners, checkColision
 from game.config import SCALE, SCREEN_HEIGHT, SCREEN_WIDTH, MAP_WIDTH, MAP_HEIGHT
-from game.menu import openMenu
+from game.gameMenu import openGameMenu
 from game.levels import levels
 import pygame
 import threading
@@ -86,7 +86,7 @@ def buildLevel(level: int):
     world.objects.append(player)
     world.objects.append(finish)
 
-def main():
+def game(screen: pygame.Surface, clock: pygame.time.Clock):
     # config and settings
     global activateMenu
     global world
@@ -95,10 +95,6 @@ def main():
     global menuActions
 
     buildLevel(0)
-
-    pygame.init()
-    screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
-    clock = pygame.time.Clock()
 
     # event loop
     while True:
@@ -113,7 +109,7 @@ def main():
         # opening menu/ frame generation
         if activateMenu:
             activateMenu = False
-            menuActions = openMenu(screen, player, clock)
+            menuActions = openGameMenu(screen, player, clock)
             continue
         else:
             generateFrame(screen, world)
@@ -131,4 +127,7 @@ def main():
                 level = 0
                 buildLevel(level)
 if __name__ == "__main__":
-    main()
+    pygame.init()
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    clock = pygame.time.Clock()
+    game(screen, clock)
